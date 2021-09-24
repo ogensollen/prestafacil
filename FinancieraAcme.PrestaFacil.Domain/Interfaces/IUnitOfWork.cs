@@ -6,5 +6,8 @@ namespace FinancieraAcme.PrestaFacil.Domain.Interfaces
 {
     public interface IUnitOfWork
     {
+         ISolicitudPrestamoRepository SolicitudPrestamoRepository { get; }
+         Task GuardarAsync();
     }
+
 }
