@@ -1,0 +1,101 @@
+﻿@model FinancieraAcme.PrestaFacil.Domain.Entities.SolicitudDetalle
+@using FinancieraAcme.PrestaFacil.Domain.Entities
+
+@{
+    ViewData["Title"] = "RegistrarDetalle";
+    List<SolicitudDetalle> detalles = ViewBag.Detalles;
+}
+
+<h1>Datos de la solicitud</h1>
+<hr />
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            Cliente:
+        </dt>
+        <dd class="col-sm-10">
+            @ViewBag.Cliente
+        </dd>
+        <dt class="col-sm-2">
+            Fecha del pedido:
+        </dt>
+        <dd class="col-sm-10">
+            @ViewBag.Fecha
+        </dd>
+    </dl>
+</div>
+
+
+<h4>Registro del detalle</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="RegistrarDetalle">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="SolicitudCabeceraId" class="control-label"></label>
+                <input asp-for="SolicitudCabeceraId" class="form-control" />
+                <span asp-validation-for="SolicitudCabeceraId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Item" class="control-label"></label>
+                <input asp-for="Item" class="form-control" />
+                <span asp-validation-for="Item" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Producto" class="control-label"></label>
+                <input asp-for="Producto" class="form-control" />
+                <span asp-validation-for="Producto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<h4>Listado de items</h4>
+@if (detalles.Count == 0)
+{
+    <span>Por favor agregue algun detalle.</span>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Item
+                </th>
+                <th>
+                    Producto
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detalle in detalles)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => detalle.Item)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => detalle.Producto)
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<hr/>
+<form asp-action="RegistrarPedido">
+    <input type="submit" value="Grabar" class="btn btn-danger" /> |
+    <a asp-action="Registrar">Regresar</a>
+</form>
+
+<span style="color:blue;">@ViewBag.Mensaje</span>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

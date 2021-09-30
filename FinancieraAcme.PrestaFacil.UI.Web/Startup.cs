@@ -1,20 +1,15 @@
 using FinancieraAcme.PrestaFacil.Domain.Interfaces;
 using FinancieraAcme.PrestaFacil.Infraestructure.Data.Model;
 using FinancieraAcme.PrestaFacil.Infraestructure.Data.Repositories;
+using FinancieraAcme.PrestaFacil.Infraestructure.Data.UnitOfWork;
 using FinancieraAcme.PrestaFacil.UI.Web.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FinancieraAcme.PrestaFacil.UI.Web
 {
@@ -30,6 +25,15 @@ namespace FinancieraAcme.PrestaFacil.UI.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // se habilita los servicios para uso de sesiones (Session Managament)
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = System.TimeSpan.FromMinutes(20);
+                options.Cookie.IsEssential = true;
+                options.Cookie.HttpOnly = true;
+            });
+
             // fuentes de datos
             services.AddDbContext<PrestaFacilDbContext>(options =>
                 options.UseSqlServer(
@@ -39,8 +43,14 @@ namespace FinancieraAcme.PrestaFacil.UI.Web
                     Configuration.GetConnectionString("DefaultConnection")));
 
             // repositorios
+            services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<ISolicitudPrestamoRepository, SolicitudPrestamoRepository>();
-            // ...
+            services.AddScoped<ISolicitudCabeceraRepository, SolicitudCabeceraRepository>();
+            services.AddScoped<ISolicitudDetalleRepository, SolicitudDetalleRepository>();
+            // repositorios...
+
+            // unit of work
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -69,6 +79,9 @@ namespace FinancieraAcme.PrestaFacil.UI.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // para habilitar el uso de sesiones
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
